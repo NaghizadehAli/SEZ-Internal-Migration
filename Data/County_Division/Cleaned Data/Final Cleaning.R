@@ -29,3 +29,28 @@ for (i in c) {
 }
 
 write_xlsx(A,"G:/Github/SEZ-Internal-Migration/Data/County_Division/Cleaned Data/Final_County_ID.xlsx")
+
+# Find New County in Years
+
+B <- list()
+
+year<- c("98","97","96","95","94","93","92","91","90","89","88","85","82","81","76")
+
+
+for (i in 1:(length(year)-1)) {
+  
+  GEO2 <- read_xlsx("G:/Github/SEZ-Internal-Migration/Data/County_Division/Cleaned Data/Final_County_ID.xlsx",sheet = year[i])
+  GEO2 <- GEO2%>%
+    select(County_ID,Province,County)
+  
+  GEO1 <- read_xlsx("G:/Github/SEZ-Internal-Migration/Data/County_Division/Cleaned Data/Final_County_ID.xlsx",sheet = year[i+1])
+  GEO1 <- GEO1%>%
+    select(County_ID,Province,County)
+  
+  diff <- anti_join(GEO2,GEO1)
+  
+  B[paste0(year[i],"-",year[i+1])] <- list(diff)
+  
+} 
+
+write_xlsx(B,"G:/Github/SEZ-Internal-Migration/Data/County_Division/Cleaned Data/Diff_County.xlsx")
