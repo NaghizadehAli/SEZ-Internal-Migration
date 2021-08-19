@@ -85,3 +85,67 @@ for (i in sheets) {
   Division_C_N <- Division_C_N%>%
     left_join(FCID,by = "Province_ID")
 }
+
+
+################################################################################
+                  # Counting Number of  Missing Counties#
+                              # Years 84:98  #
+################################################################################
+
+LFS_MC <- tibble(Province_ID = LFS_C_N$Province_ID)
+
+for (Year in 84:98) {
+  W3 <- readRDS(paste0("F:/LFS/Processed data/",Year,"/W3.RDS"))
+  
+  W3 <- W3%>%
+    select(HHID,Season,Province_ID)%>%
+    left_join(County_ID,by = "HHID")%>%
+    distinct(Season,Province_ID,Shahrestan,.keep_all = T)%>%
+    group_by(Season,Province_ID)%>%
+    dplyr::mutate(Missing_Counties = sum(is.na(Shahrestan)))%>%
+    distinct(Season,Province_ID,Missing_Counties)%>%
+    ungroup(Season)
+  
+  S1 <- W3%>%
+    filter(Season == "01")%>%
+    select(-Season)
+  colnames(S1)[2] <-  paste0(Year,"01")
+  
+  S2 <- W3%>%
+    filter(Season == "02")%>%
+    select(-Season)
+  colnames(S2)[2] <-  paste0(Year,"02")
+  
+  S3 <- W3%>%
+    filter(Season == "03")%>%
+    select(-Season)
+  colnames(S3)[2] <-  paste0(Year,"03")
+  
+  S4 <- W3%>%
+    filter(Season == "04")%>%
+    select(-Season)
+  colnames(S4)[2] <-  paste0(Year,"04")
+  
+  LFS_MC <- LFS_MC%>%
+    left_join(S1,by = "Province_ID")%>%
+    left_join(S2,by = "Province_ID")%>%
+    left_join(S3,by = "Province_ID")%>%
+    left_join(S4,by = "Province_ID")
+  
+}
+
+LFS_MC <- LFS_MC %>%
+  mutate(Sum = rowSums(.[2:61],na.rm = TRUE))%>%
+  filter(Sum != 0)%>%
+  select(-Sum)
+  
+LFS_MC <- LFS_MC[, colSums(LFS_MC != 0) > 0]
+
+
+#select(which(colSums(.) > 0))
+#bind_rows(summarise_all(., ~if(is.numeric(.)) sum(.) else "Total"))
+
+
+
+
+
