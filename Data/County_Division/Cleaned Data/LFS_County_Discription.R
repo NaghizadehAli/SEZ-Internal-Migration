@@ -2,6 +2,7 @@ rm(list=ls())
 
 library(tidyverse)
 library(dplyr)
+library(readxl)
 
 ################################################################################
     # Counting Number of LFS Counties in each Province During years 84:98 #
@@ -14,8 +15,8 @@ County_ID <- County_ID%>%
 
 LFS_C_N <- tibble(Province_ID = c("00","01","02","03","04","05","06","07","08",
                                   "09","10","11","12","13","14","15","16","17",
-                                  "18","19","20","21","22","23","23","24","25",
-                                  "26","27","28","29","30")) # Number of LFS Counties 
+                                  "18","19","20","21","22","23","24","25","26",
+                                  "27","28","29","30")) # Number of LFS Counties 
 
 for (Year in 84:98) {
   W3 <- readRDS(paste0("F:/LFS/Processed data/",Year,"/W3.RDS"))
@@ -58,4 +59,29 @@ for (Year in 84:98) {
   
 }
 
+################################################################################
+# Counting Number of  Counties in each Province According to Country division #
+                               # Years 84:98  #
+################################################################################
+sheets <- excel_sheets("Data/County_Division/Cleaned Data/Final_County_ID.xlsx")
+Division_C_N <- tibble(Province_ID = LFS_C_N$Province_ID)
 
+for (i in sheets) {
+  
+  FCID <- read_xlsx("Data/County_Division/Cleaned Data/Final_County_ID.xlsx",
+                               sheet = i) # Final County ID , County Division
+  
+  FCID <- FCID%>%
+    select(County_ID,Province,County)%>%
+    mutate(Province_ID = str_sub(County_ID,1,2))%>%
+    group_by(Province)%>%
+    dplyr::mutate(N=n())%>%
+    ungroup(Province)%>%
+    distinct(Province,.keep_all = T)%>%
+    select(Province_ID,N)
+  
+  colnames(FCID)[colnames(FCID) == "N"] <- i
+    
+  Division_C_N <- Division_C_N%>%
+    left_join(FCID,by = "Province_ID")
+}
