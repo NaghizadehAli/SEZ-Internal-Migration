@@ -1,0 +1,61 @@
+rm(list=ls())
+
+library(tidyverse)
+library(dplyr)
+
+################################################################################
+    # Counting Number of LFS Counties in each Province During years 84:98 #
+################################################################################
+County_ID <- readRDS("F:/LFS/Processed data/County_ID.RDS")
+
+County_ID <- County_ID%>%
+  select(HHID,County_ID_23)%>%
+  rename("Shahrestan" = "County_ID_23")
+
+LFS_C_N <- tibble(Province_ID = c("00","01","02","03","04","05","06","07","08",
+                                  "09","10","11","12","13","14","15","16","17",
+                                  "18","19","20","21","22","23","23","24","25",
+                                  "26","27","28","29","30")) # Number of LFS Counties 
+
+for (Year in 84:98) {
+  W3 <- readRDS(paste0("F:/LFS/Processed data/",Year,"/W3.RDS"))
+  
+  W3 <- W3%>%
+    select(HHID,Season,Province_ID)%>%
+    left_join(County_ID,by = "HHID")%>%
+    distinct(Season,Province_ID,Shahrestan,.keep_all = T)%>%
+    group_by(Season,Province_ID)%>%
+    summarise(N = n())%>%
+    ungroup(Season)
+  
+  
+  S1 <- W3%>%
+    filter(Season == "01")%>%
+    select(-Season)
+  colnames(S1)[2] <-  paste0(Year,"01")
+  
+  S2 <- W3%>%
+    filter(Season == "02")%>%
+    select(-Season)
+  colnames(S2)[2] <-  paste0(Year,"02")
+  
+  S3 <- W3%>%
+    filter(Season == "03")%>%
+    select(-Season)
+  colnames(S3)[2] <-  paste0(Year,"03")
+  
+  S4 <- W3%>%
+    filter(Season == "04")%>%
+    select(-Season)
+  colnames(S4)[2] <-  paste0(Year,"04")
+  
+  LFS_C_N <- LFS_C_N%>%
+    left_join(S1,by = "Province_ID")%>%
+    left_join(S2,by = "Province_ID")%>%
+    left_join(S3,by = "Province_ID")%>%
+    left_join(S4,by = "Province_ID")
+    
+  
+}
+
+
