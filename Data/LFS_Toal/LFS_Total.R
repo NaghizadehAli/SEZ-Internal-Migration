@@ -83,3 +83,27 @@ for (year in 84:98) {
   
   FORM2_Total <- bind_rows(FORM2_Total,FORM2)
 }
+
+################################################################################
+                          # Create W3 Total Data set #
+################################################################################
+
+W3_Total <- tibble()
+
+County <- readRDS("F:/LFS/Processed data/County_ID.RDS")
+
+County <- County%>%
+  select(HHID,County_ID_23)%>%
+  rename("County_ID" = "County_ID_23")
+
+for (year in 84:98) {
+  W3 <- readRDS(paste0("F:/LFS/Processed data/",year,"/W3.RDS"))
+  
+  W3 <- W3%>%
+    select(-Shahrestan)%>%
+    left_join(County,by = "HHID")%>%
+    mutate(Seasonal_KJ = paste0(Year,Season,Province_ID,County_ID))%>%
+    select(-HHID,-IID)
+  
+  W3_Total <- bind_rows(W3_Total,W3)
+}
