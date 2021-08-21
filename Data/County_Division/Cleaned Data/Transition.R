@@ -48,7 +48,7 @@ Year <- c("98","97","96","95","94","93","92","91","90","89","88","85","82")
 
 TRTo82_I <- tibble()
   
-for (i in 1:12) {
+for (i in 1:13) {
   
   TR <- Transition_I%>%
     select(eval(i),13)%>%
@@ -58,6 +58,9 @@ for (i in 1:12) {
   
   TRTo82_I <- bind_rows(TRTo82_I,TR)
 }
+
+TRTo82_I <- TRTo82_I%>%
+  mutate(CID_82 = ifelse(is.na(CID_82) & Year == 82 ,C_ID,CID_82))
 
 TRTo82_I <- TRTo82_I%>%
   select(Year,everything())
