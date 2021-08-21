@@ -1,6 +1,7 @@
 rm(list = ls())
 library(readxl)
 library(tidyverse)
+library(writexl)
 getwd()
 
 CIDY <- excel_sheets("Data/County_Division/Cleaned Data/Final_County_ID.xlsx") # County ID Years
@@ -52,4 +53,4 @@ D_Y<- W3_TC %>%
   rename("Year"="Year.x")%>%
   distinct(Year,Division_Year)
 
-
+write_xlsx(D_Y,"Data/County_Division/Cleaned Data/Division_Year.xlsx")
