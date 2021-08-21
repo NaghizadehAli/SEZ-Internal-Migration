@@ -55,12 +55,14 @@ for (i in 1:13) {
     mutate(Year = Year[i])
   
   colnames(TR)[1] <- "C_ID"
+
   
   TRTo82_I <- bind_rows(TRTo82_I,TR)
 }
 
 TRTo82_I <- TRTo82_I%>%
-  mutate(CID_82 = ifelse(is.na(CID_82) & Year == 82 ,C_ID,CID_82))
+  mutate(CID_82 = ifelse(is.na(CID_82) & Year == 82 ,C_ID,CID_82))%>%
+  distinct(C_ID,CID_82,Year,.keep_all = T)
 
 TRTo82_I <- TRTo82_I%>%
   select(Year,everything())
