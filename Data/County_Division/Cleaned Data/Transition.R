@@ -27,7 +27,7 @@ for (i in 1:(length(Diff_Sheet)-1)) {
     left_join(DiFF,by = "County_ID")%>%
     mutate(Previous_C_ID = ifelse(is.na(Previous_C_ID),County_ID,Previous_C_ID))
   
-  colnames(Transition_I)[colnames(Transition_I) == "County_ID"] <- paste0("CID_",County_Sheet[i])
+  colnames(Transition_I)[colnames(Transition_I) == "County_ID"] <- paste0("CID_",str_sub(Diff_Sheet[i],1,2))
   colnames(Transition_I)[colnames(Transition_I) == "Previous_C_ID"] <- "County_ID"
   
 }
@@ -44,22 +44,25 @@ Transition_I <- Transition_I%>%
 New_County_I <- Transition_I%>%
   filter(Equal == 0)
 
-Year <- c("98","97","96","95","94","93","92","91","90","89","88","85","82","81")
+Year <- c("98","97","96","95","94","93","92","91","90","89","88","85","82")
 
-TRTo81_I <- tibble()
+TRTo82_I <- tibble()
   
-for (i in 1:13) {
+for (i in 1:12) {
   
   TR <- Transition_I%>%
-    select(eval(i),14)%>%
+    select(eval(i),13)%>%
     mutate(Year = Year[i])
   
   colnames(TR)[1] <- "C_ID"
-  colnames(TR)[colnames(TR) == "County_ID"] <- "CID_81"
   
-  TRTo81_I <- bind_rows(TRTo81_I,TR)
+  TRTo82_I <- bind_rows(TRTo82_I,TR)
 }
 
+TRTo82_I <- TRTo82_I%>%
+  select(Year,everything())
+
+saveRDS(TRTo82_I,"Data/County_Division/Cleaned Data/TRTo82.RDS")
 ################################################################################
                   # Transition Data set with County  #
 ################################################################################
