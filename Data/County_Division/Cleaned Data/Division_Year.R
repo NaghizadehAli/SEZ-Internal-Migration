@@ -50,7 +50,6 @@ D_Y<- W3_TC %>%
   group_by(Year.x,Season)%>%
   filter(County_ID != "2911")%>%
   summarise(Division_Year = max(Year.y,na.rm = TRUE))%>%
-  rename("Year"="Year.x")%>%
-  distinct(Year,Division_Year)
+  rename("Year"="Year.x")
 
 write_xlsx(D_Y,"Data/County_Division/Cleaned Data/Division_Year.xlsx")
