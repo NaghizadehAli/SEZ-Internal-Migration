@@ -54,3 +54,32 @@ for (year in 84:98) {
   FORM3_Total <- bind_rows(FORM3_Total,FORM3)
 }
 
+################################################################################
+                    # Create FROM2 Total Data set #
+################################################################################
+
+
+FORM2_Total <- tibble()
+
+for (year in 84:98) {
+  FORM2 <- readRDS(paste0("F:/LFS/Processed data/",year,"/FORM2JOZ.RDS"))
+  
+  FORM2[FORM2 == -1] <- NA
+  
+  FORM2 <- FORM2 %>%
+    mutate(Migrant = case_when(
+      F2_D11 %in% c("Other places Same City","NR") ~ "No",
+      is.na(F2_D11) ~ NA_character_,
+      TRUE~"Yes"
+    ))%>%
+    mutate(Provincial_Migrant = case_when(
+      F2_D11 %in% c("Other City Other Province","Other Village Other Province") ~ "Yes",
+      is.na(F2_D11) ~ NA_character_ ,
+      TRUE ~ "No"))%>%
+    select(Pkey,Relation,Gender,Age,Nationality,F2_D13,Student,
+           Literacy,Degree,Marriage_Status,Migrant,Provincial_Migrant)%>%
+    mutate(Migrant = factor(Migrant,levels = c("Yes","No")))%>%
+    mutate(Provincial_Migrant = factor(Provincial_Migrant,levels = c("Yes","No")))
+  
+  FORM2_Total <- bind_rows(FORM2_Total,FORM2)
+}
